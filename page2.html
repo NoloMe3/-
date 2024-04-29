@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Demo: 江苏人口数量图</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      h2,
+      h3 {
+        margin: 10px;
+        font-size: 18px;
+      }
+
+      h3 {
+        font-size: 16px;
+      }
+
+      p {
+        margin: 10px;
+      }
+
+      .map-overlay {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: #fff;
+        margin-right: 20px;
+        font-family: Arial, sans-serif;
+        overflow: auto;
+        border-radius: 3px;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      #features {
+        top: 0;
+        height: 100px;
+        margin-top: 20px;
+        width: 250px;
+      }
+
+      #legend {
+        padding: 10px;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+        line-height: 18px;
+        height: 150px;
+        margin-bottom: 40px;
+        width: 100px;
+      }
+
+      .legend-key {
+        display: inline-block;
+        border-radius: 20%;
+        width: 10px;
+        height: 10px;
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="map-overlay" id="features">
+      <h2>江苏人口数量图</h2>
+      <div id="pd"><p>鼠标停留在地图上！</p></div>
+    </div>
+    <div class="map-overlay" id="legend"></div>
+
+    <script>
+      // define access token
+      mapboxgl.accessToken = 'pk.eyJ1Ijoibm9sb21lMyIsImEiOiJjbHRmaWN4ZGUwcnMzMmtyd2dkaTAxbWd3In0._SD_Ra9b2BiNBstDR_YRAg';
+
+      // create map
+      const map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/nolome3/clv3ibug500e101q1a2wo94km'// map style URL from Mapbox Studio
+      });
+
+      // wait for map to load before adjusting it
+      map.on('load', () => {
+        // make a pointer cursor
+        map.getCanvas().style.cursor = 'default';
+
+        // set map bounds to the continental US
+        map.fitBounds([
+        [118.233, 30.748],
+        [121.997, 34.849]
+      ]);
+        // define layer names
+        const layers = [
+          '200-400',
+          '400-600',
+          '600-800',
+          '800-1000',
+          '1000-1200',
+          '1200+'
+        ];
+        const colors = [
+          '#d8dbfd',
+          '#9c92fc',
+          '#7566fa',
+          '#1f06f9',
+          '#1605ad',
+          '#070137',
+        ];
+
+        // create legend
+        const legend = document.getElementById('legend');
+
+        layers.forEach((layer, i) => {
+          const color = colors[i];
+          const item = document.createElement('div');
+          const key = document.createElement('span');
+          key.className = 'legend-key';
+          key.style.backgroundColor = color;
+
+          const value = document.createElement('span');
+          value.innerHTML = `${layer}`;
+          item.appendChild(key);
+          item.appendChild(value);
+          legend.appendChild(item);
+        });
+
+        map.on('mousemove', function(e) {
+            var states = map.queryRenderedFeatures(e.point, {
+            layers: ['jiangsu-population-30phkh']
+            });
+            if (states.length > 0) {
+            document.getElementById('pd').innerHTML ='<h3><strong>' +
+            states[0].properties.name +
+            '</strong></h3><p><strong><em>'+states[0].properties.density+'</strong> /万人</em></p>';
+            } else {
+            document.getElementById('pd').innerHTML = '<p>鼠标停留在地图上!!!</p>';
+            }
+            });
+      });
+    </script>
+  </body>
+</html>
